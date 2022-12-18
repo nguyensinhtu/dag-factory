@@ -37,6 +37,11 @@ example_breadfast:
         - begin
         - make_bread_1
         - make_bread_2
+    transform:
+      dbt_model: jaffle_shop
+      dbt_path: $dbt.dbt_proejct.yaml
+      dependencies:
+        - make_coffee_1
     end:
       operator: airflow.operators.dummy_operator.DummyOperator
       dependencies:

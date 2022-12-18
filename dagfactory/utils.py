@@ -7,6 +7,7 @@ import sys
 import types
 from datetime import date, datetime, timedelta
 from typing import Any, AnyStr, Dict, Match, Optional, Pattern, Union
+import click as cli
 from pathlib import Path
 
 import pendulum
@@ -183,3 +184,8 @@ def convert_to_snake_case(input_string: str) -> str:
     return "".join("_" + i.lower() if i.isupper() else i for i in input_string).lstrip(
         "_"
     )
+
+
+def call_click_command(cmd: cli.Command, **kwargs):
+    opt_name_to_opt = {opt.name: opt for opt in cmd.params if isinstance(opt, cli.Option)}
+    print(opt_name_to_opt)

@@ -10,6 +10,7 @@ from airflow.configuration import conf as airflow_conf
 from airflow.models import DAG
 
 from dagfactory.dagbuilder import DagBuilder
+from dagfactory.dbtdagbuilder import DbtDagBuilder
 
 
 # these are params that cannot be a dag name
@@ -100,13 +101,20 @@ class DagFactory:
 
         dags: Dict[str, Any] = {}
 
+        dag_builder: Union[DagBuilder, DbtDagBuilder] = None
+
         for dag_name, dag_config in dag_configs.items():
             dag_config["task_groups"] = dag_config.get("task_groups", {})
-            dag_builder: DagBuilder = DagBuilder(
-                dag_name=dag_name,
-                dag_config=dag_config,
-                default_config=default_config,
-            )
+            is_dbt_model = dag_config.get("dbt_path", "") != ""
+            if is_dbt_model:
+                dag_builder = DbtDagBuilder()
+            else:
+                dag_builder: DagBuilder = DagBuilder(
+                    dag_name=dag_name,
+                    dag_config=dag_config,
+                    default_config=default_config,
+                )
+            
             try:
                 dag: Dict[str, Union[str, DAG]] = dag_builder.build()
                 dags[dag["dag_id"]]: DAG = dag["dag"]
